@@ -6,10 +6,6 @@
 		position: absolute; top: 0px; left: 0px;
 		z-index:-1;
 	}
-	#canv{
-		background-color: rgba(150,0,150,.2);
-		position: absolute; top: 0px; left: 0px;
-	}
 	button{
 		position: relative;
 	}
@@ -18,42 +14,58 @@
 	}	
 
 </style>
-<body onload = "imgDim()" onkeypress="printCoords()" > 
-<img id="table" src="https://www.dummies.com/wp-content/uploads/503641.image0.jpg"></img>
-<canvas onmousedown="mouseDown()" onmouseup="mouseUp()" id="canv"></canvas>
+<body onload = "imgDim()" onkeypress="printCoords()" >
+<div id="container"> 
+	<img id="table" src="https://www.dummies.com/wp-content/uploads/503641.image0.jpg"></img>
+</div>
 <form action = "http://localhost:8080" method="POST">
 	<textarea class = "json" name = "JSON" type="text" id ="json"></textarea>
 	<button id ="but" type="submit">Get Coordinates</button>
 </form>
 
 <!--script to record drawn rectangles-->
-<script> 
-var isDown = false;
-var startX,finalX;
-var startY,finalY;
-var rect = document.getElementById("canv").getBoundingClientRect();
+<script>
+document.addEventListener("mousedown",mouseDown);
+document.addEventListener("mouseup",mouseUp);
+document.addEventListener("mousemove",mouseMove);
+var isDown=false; 
+var row =0;
+var col =0;
+var startX,finalX,startY,finalY,rect;
 var allCoords={
 	table:[]
 };
-function mouseDown(){
-	isDown = true;
-	startX = event.clientX-rect.left;
-	startY = event.clientY-rect.top;
-	document.getElementById("canv").style.cursor = "crosshair";
+var rowCol={
+	rc:[]
+};
+function mouseDown(e){
+	rect = document.createElement("canvas");
+	rect.width = document.getElementById("table").clientWidth;
+	rect.height = document.getElementById("table").clientHeight;
+	rect.style.cssText = "position:absolute;top:0px;left:0px;";
+	document.getElementById("container").appendChild(rect);
+	isDown=true;
+	startX = e.clientX-rect.getBoundingClientRect().left;
+	startY = e.clientY-rect.getBoundingClientRect().top;
+	rect.style.cursor = "crosshair";
 }
 
-function mouseUp(){
-	isDown = false;
-	finalX = event.clientX-rect.left;
-	finalY = event.clientY-rect.top;
-	var ctx = document.getElementById("canv").getContext("2d");
-	ctx.beginPath();
-	ctx.lineWidth = 1;
-	ctx.strokeStyle = "black";
-	ctx.rect(startX,startY,finalX-startX,finalY-startY);
-	ctx.stroke();
-	document.getElementById("canv").style.cursor = "default";
+function mouseMove(e){
+	if(isDown){
+		var ctx = rect.getContext("2d");
+		ctx.clearRect(0,0,rect.width,rect.height);
+		finalX = e.clientX-rect.getBoundingClientRect().left;
+		finalY = e.clientY-rect.getBoundingClientRect().top;
+		ctx.lineWidth = 1;
+		ctx.strokeStyle = "black";
+		ctx.strokeRect(startX,startY,finalX-startX,finalY-startY);
+		rect.style.cursor = "default";
+	}
 
+	
+}
+function mouseUp(e){
+	isDown=false;
 	var points = {minX:startX, minY:startY, maxX:finalX, maxY:finalY};
 	allCoords.table.push(points);
 }
@@ -61,9 +73,6 @@ function mouseUp(){
 function imgDim(){
 	var width = document.getElementById("table").offsetWidth;
 	var height = document.getElementById("table").offsetHeight;
-	var canv = document.getElementById("canv");
-	canv.width = document.getElementById("table").clientWidth;
-	canv.height = document.getElementById("table").clientHeight;
 	document.getElementById("but").style.left = "0px";
 	document.getElementById("but").style.top = height+'px';
 	document.getElementById("json").style.left = "0px";
@@ -72,7 +81,7 @@ function imgDim(){
 function printCoords(){
 	var k = event.key;
 	if(k == 'z'){
-		var ctx = document.getElementById("canv").getContext("2d");
+		var ctx = rect.getContext("2d");
 		ctx.clearRect(startX-5,startY-5,finalX-startX+10,finalY-startY+10);
 		allCoords.table.pop();
 	}
@@ -80,10 +89,6 @@ function printCoords(){
 		var json = JSON.stringify(allCoords);
 		document.getElementById("json").innerHTML = json;
 		console.log(document.getElementById("json").innerHTML);
-		console.log(document.getElementById("canv").width);
-		console.log(document.getElementById("canv").height);
-		console.log(document.getElementById("table").width);
-		console.log(document.getElementById("table").height);
 	}	
 }
 
