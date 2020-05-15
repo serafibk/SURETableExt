@@ -11,17 +11,21 @@
 	}
 	.json{
 		position: relative;
+	}
+	#fr{
+		position: relative;
 	}	
 
 </style>
 <body onload = "imgDim()" onkeypress="printCoords()" >
 <div id="container"> 
-	<img id="table" src="https://www.dummies.com/wp-content/uploads/503641.image0.jpg"></img>
+	<img id="table" src="/Users/serafinakamp/Desktop/TableExt/datasheet-scrubber/src/Table_Extraction_Weight_Creation/modern_images/from_modern0.jpg"></img>
 </div>
-<form action = "http://localhost:8080" method="POST">
+<form action = "http://localhost:8080" method="POST" target = "submitCoords">
 	<textarea class = "json" name = "JSON" type="text" id ="json"></textarea>
 	<button id ="but" type="submit">Get Coordinates</button>
 </form>
+<iframe name = "submitCoords" id = "fr"></iframe>
 
 <!--script to record drawn rectangles-->
 <script>
@@ -77,6 +81,8 @@ function imgDim(){
 	document.getElementById("but").style.top = height+'px';
 	document.getElementById("json").style.left = "0px";
 	document.getElementById("json").style.top = height+'px';
+	document.getElementById("fr").style.left = "0px";
+	document.getElementById("fr").style.top = height+'px';
 }
 function printCoords(){
 	var k = event.key;
