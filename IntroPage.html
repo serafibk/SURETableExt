@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Training Dataset!</title>
+</head>
+
+<!--this is css part-->
+<style>
+	#table{
+		position: relative; top: 0px; left: 0px;
+		z-index:-1;
+	}
+	button{
+		position: relative;
+	}
+	.json{
+		position: relative;
+	}	
+
+</style>
+
+
+<!--start information, provide guidance of using the tool-->
+<h3>Guidance</h3>
+<font size="4">1. use the mouse to select the cell<br>2. press enter to see the Coordinates <br><br></font>
+
+<body>
+    <form action="../tablext-html/tableExt.html">
+        <div class="Training">
+            Image Upload:<br>
+            <input name="evidence" onchange="uploadImg(this,'Preview')" type="file"/>
+            <span class="Img" id="imgOrder" style="display: none;"></span>
+        </div>
+        <div id="Preview">
+            <img src="" alt="" id="imgHead" width="300" height="400"/>
+        </div>
+        <input type="submit" id="">
+    </form>
+
+<script>
+    function uploadImg(file,imgNum){
+        var widthImg = 300;
+        var heightImg = 400;
+        var div = document.getElementById(imgNum);
+        if (file.files && file.files[0]){
+            div.innerHTML ='<img id="upImg">';
+            var img = document.getElementById('upImg');
+            img.onload = function(){
+                img.width = widthImg;
+                img.height = heightImg;
+            }
+        }
+        var reader = new FileReader();
+        reader.onload = function(evt){
+            if(reader.readyState === 2){
+                img.src = evt.target.result;
+            }
+        }
+        reader.readAsDataURL(file.files[0]); 
+    }
+</script>
+</body>
+</html>
