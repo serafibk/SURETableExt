@@ -6,19 +6,19 @@
 
 <!--start information, provide guidance of using the tool-->
 <h3>Guidance</h3>
-<font size="4">Please Upload the Image that need to be Trained (.jpg format)<br><br></font>
+<font size="4">Please Upload the Image that need to be Trained (.jpg .png .jpeg format)<br><br></font>
 
 <body>
-    <!--can add a warning on incorrect formal-->
-    <form action="../tablext-html/tableExt.html">
+    <form action="../tablext-html/tableExt.html" method="POST" enctype="multipart/form-data">
         <div class="Training">
             Image Upload:<br>
             <input name="evidence" onchange="uploadImg(this,'Preview')" type="file"/>
             <span class="Img" id="imgOrder" style="display: none;"></span>
         </div>
         <div id="Preview">
-            <img src="" alt="" id="imgHead" width="300" height="400"/>
+            <img src="" alt="" id="imgHead" width="300" height="400" accept="image/jpeg, image/png, image/jpg"/>
         </div>
+        <p id="img_info"></p>
         <input type="submit" id="">
     </form>
 
@@ -27,6 +27,10 @@
         var widthImg = 300;
         var heightImg = 400;
         var div = document.getElementById(imgNum);
+        if(file.files[0].type !== 'image/jpeg' && file.files[0].type !== 'image/png' && file.files[0].type !== 'image/jpg') {
+              alert('invalid image: need to be .jpg/.jpeg/.png');
+              return;
+        }
         if (file.files && file.files[0]){
             div.innerHTML ='<img id="upImg">';
             var img = document.getElementById('upImg');
@@ -41,7 +45,17 @@
                 img.src = evt.target.result;
             }
         }
-        reader.readAsDataURL(file.files[0]); 
+        reader.readAsDataURL(file.files[0]);
+        //console.log(file.files[0])
+        //gain info
+        info = document.getElementById('img_info');
+        if(!file.value) {
+            info.innerHTML = 'no file choice';
+            return;
+        }
+        var size = file.files[0].size;
+        info.innerHTML = 'file name: ' + file.files[0].name + '<br>'
+                       + 'size: ' + file.files[0].size / 1024 + 'KB';
     }
 </script>
 </body>
