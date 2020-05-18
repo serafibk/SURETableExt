@@ -19,7 +19,7 @@
 </style>
 <body onload = "imgDim()" onkeypress="printCoords()" >
 <div id="container"> 
-	<img id="table" src="/Users/serafinakamp/Desktop/TableExt/datasheet-scrubber/src/Table_Extraction_Weight_Creation/modern_images/from_modern0.jpg"></img>
+	<img id="table" src=""></img>
 </div>
 <form action = "http://localhost:8080" method="POST" target = "submitCoords">
 	<textarea class = "json" name = "JSON" type="text" id ="json"></textarea>
@@ -75,6 +75,8 @@ function mouseUp(e){
 }
 
 function imgDim(){
+	document.getElementById("table").src = localStorage.getItem("imgSrc");
+
 	var width = document.getElementById("table").offsetWidth;
 	var height = document.getElementById("table").offsetHeight;
 	document.getElementById("but").style.left = "0px";
