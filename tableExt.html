@@ -18,7 +18,7 @@
 
 </style>
 <body onload = "imgDim()" onkeypress="printCoords()" >
-<div id="container"> 
+<div id="container" onmousedown="mouseDown()" onmouseup="mouseUp()" onmousemove="mouseMove()"> 
 	<img id="table" src=""></img>
 </div>
 <form action = "http://localhost:8080" method="POST" target = "submitCoords">
@@ -29,9 +29,6 @@
 
 <!--script to record drawn rectangles-->
 <script>
-document.addEventListener("mousedown",mouseDown);
-document.addEventListener("mouseup",mouseUp);
-document.addEventListener("mousemove",mouseMove);
 var isDown=false; 
 var row =0;
 var col =0;
@@ -42,24 +39,24 @@ var allCoords={
 var rowCol={
 	rc:[]
 };
-function mouseDown(e){
+function mouseDown(){
 	rect = document.createElement("canvas");
 	rect.width = document.getElementById("table").clientWidth;
 	rect.height = document.getElementById("table").clientHeight;
 	rect.style.cssText = "position:absolute;top:0px;left:0px;";
 	document.getElementById("container").appendChild(rect);
 	isDown=true;
-	startX = e.clientX-rect.getBoundingClientRect().left;
-	startY = e.clientY-rect.getBoundingClientRect().top;
+	startX = event.clientX-rect.getBoundingClientRect().left;
+	startY = event.clientY-rect.getBoundingClientRect().top;
 	rect.style.cursor = "crosshair";
 }
 
-function mouseMove(e){
+function mouseMove(){
 	if(isDown){
 		var ctx = rect.getContext("2d");
 		ctx.clearRect(0,0,rect.width,rect.height);
-		finalX = e.clientX-rect.getBoundingClientRect().left;
-		finalY = e.clientY-rect.getBoundingClientRect().top;
+		finalX = event.clientX-rect.getBoundingClientRect().left;
+		finalY = event.clientY-rect.getBoundingClientRect().top;
 		ctx.lineWidth = 1;
 		ctx.strokeStyle = "black";
 		ctx.strokeRect(startX,startY,finalX-startX,finalY-startY);
@@ -68,7 +65,7 @@ function mouseMove(e){
 
 	
 }
-function mouseUp(e){
+function mouseUp(){
 	isDown=false;
 	var points = {minX:startX, minY:startY, maxX:finalX, maxY:finalY};
 	allCoords.table.push(points);
