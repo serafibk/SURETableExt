@@ -7,20 +7,24 @@
 		z-index:-1;
 	}
 	button{
-		position: relative;
+		position: absolute; top: 5px; left: 200px;
 	}
 	.json{
+		position: absolute; top: 5px; left: 200px; display:none;
+	}
+	#upload{
 		position: relative;
 	}
 	#fr{
-		position: relative; width:100px;height:100px;
+		position: absolute; width:50px;height:50px; top: 5px; left: 300px;
 	}	
 
 </style>
-<body onload = "imgDim()" onkeypress="printCoords()" >
-<div id="container" onmousedown="mouseDown()" onmouseup="mouseUp()" onmousemove="mouseMove()"> 
+<body onkeypress="printCoords()" >
+<div id="container"> 
 	<img id="table" src=""></img>
 </div>
+<input type="file" id="upload" accept="image/png, image/jpeg, image/jgp" onchange="uploadImg(this)">
 <form action = "http://localhost:8080" method="POST" target = "submitCoords">
 	<textarea class = "json" name = "JSON" type="text" id ="json"></textarea>
 	<button id ="but" type="submit" onclick="newTable()">Get Coordinates</button>
@@ -29,34 +33,54 @@
 
 <!--script to record drawn rectangles-->
 <script>
+var tableTime = false;
+var allCoords={
+	table:[]
+};
+function uploadImg(file){
+	const fr = new FileReader();
+	fr.addEventListener('load', event =>{
+		var image = document.getElementById("table");
+		image.src = event.target.result;
+		image.style.top = "100px";
+		console.log(document.getElementById("table").offsetHeight);
+		tableTime = true;	
+	});
+	fr.readAsDataURL(file.files[0]);
+	
+}
+
+document.addEventListener("mousedown", mouseDown);
+document.addEventListener("mousemove", mouseMove);
+document.addEventListener("mouseup", mouseUp);
 var isDown=false; 
 var row =0;
 var col =0;
 var startX,finalX,startY,finalY,rect;
-var allCoords={
-	table:[]
-};
 var rowCol={
 	rc:[]
 };
-function mouseDown(){
-	rect = document.createElement("canvas");
-	rect.width = document.getElementById("table").clientWidth;
-	rect.height = document.getElementById("table").clientHeight;
-	rect.style.cssText = "position:absolute;top:0px;left:0px;";
-	document.getElementById("container").appendChild(rect);
-	isDown=true;
-	startX = event.clientX-rect.getBoundingClientRect().left;
-	startY = event.clientY-rect.getBoundingClientRect().top;
-	rect.style.cursor = "crosshair";
+
+function mouseDown(e){
+	if(tableTime){
+		rect = document.createElement("canvas");
+		rect.width = document.getElementById("table").clientWidth;
+		rect.height = document.getElementById("table").clientHeight;
+		rect.style.cssText = "position:absolute;top:100px;left:0px;";
+		document.getElementById("container").appendChild(rect);
+		isDown=true;
+		startX = e.clientX-rect.getBoundingClientRect().left;
+		startY = e.clientY-rect.getBoundingClientRect().top;
+		rect.style.cursor = "crosshair";
+	}
 }
 
-function mouseMove(){
+function mouseMove(e){
 	if(isDown){
 		var ctx = rect.getContext("2d");
 		ctx.clearRect(0,0,rect.width,rect.height);
-		finalX = event.clientX-rect.getBoundingClientRect().left;
-		finalY = event.clientY-rect.getBoundingClientRect().top;
+		finalX = e.clientX-rect.getBoundingClientRect().left;
+		finalY = e.clientY-rect.getBoundingClientRect().top;
 		ctx.lineWidth = 1;
 		ctx.strokeStyle = "black";
 		ctx.strokeRect(startX,startY,finalX-startX,finalY-startY);
@@ -65,23 +89,12 @@ function mouseMove(){
 
 	
 }
-function mouseUp(){
-	isDown=false;
-	var points = {minX:startX, minY:startY, maxX:finalX, maxY:finalY};
-	allCoords.table.push(points);
-}
-
-function imgDim(){
-	document.getElementById("table").src = localStorage.getItem("imgSrc");
-
-	var width = document.getElementById("table").offsetWidth;
-	var height = document.getElementById("table").offsetHeight;
-	document.getElementById("but").style.left = "0px";
-	document.getElementById("but").style.top = height+'px';
-	document.getElementById("json").style.left = "0px";
-	document.getElementById("json").style.top = height+'px';
-	document.getElementById("fr").style.left = "0px";
-	document.getElementById("fr").style.top = height+'px';
+function mouseUp(e){
+	if(tableTime){
+		isDown=false;
+		var points = {minX:startX, minY:startY, maxX:finalX, maxY:finalY};
+		allCoords.table.push(points);
+	}
 }
 function printCoords(){
 	var k = event.key;
@@ -98,7 +111,14 @@ function printCoords(){
 }
 function newTable(){
 	allCoords.table = [];
-}
+	tableTime = false;
+	var rects = document.getElementsByTagName("canvas");
+	var I;
+	for(I=rects.length-1;I>=0;I--){
+		var canv = rects[I];
+		canv.remove();
+	}
+}	
 
 </script>
 
